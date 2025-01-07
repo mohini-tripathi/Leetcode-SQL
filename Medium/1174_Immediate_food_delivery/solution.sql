@@ -18,12 +18,14 @@ FROM (
             order_date, 
             customer_pref_delivery_date
         FROM Delivery
-        WHERE (customer_id, order_date) IN (
+        JOIN (
             SELECT 
                 customer_id, 
                 MIN(order_date) AS min_order_date
             FROM Delivery
             GROUP BY customer_id
-        )
+        ) AS min_orders
+        ON Delivery.customer_id = min_orders.customer_id 
+        AND Delivery.order_date = min_orders.min_order_date
     ) AS first_order_table
 ) AS percentage_table;
